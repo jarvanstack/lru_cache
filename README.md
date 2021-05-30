@@ -1,6 +1,13 @@
-## lru_cache
+## LRU_CACHE
 
-kv <string,string> lru cache.
+this is `kv <string,string>` lru cache.
+
+### WHAT IS LRU_CACHE?
+
+there are some instruction for goland/goupcache/lru same as this package `lru_cache`
+
+[Golang groupcache LRU ](https://cloud.tencent.com/developer/article/1478020)
+
 
 ### QUICK START
 
