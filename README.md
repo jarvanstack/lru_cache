@@ -36,6 +36,15 @@ func Test_lru_cache(t *testing.T) {
 	fmt.Printf("cache.Get(&k3)=%#v\n", *cache.Get(&k3))
 }
 ```
+out put
+```go
+cache.Size=2
+cache.Size=2
+cache.Get(&k1)="10"
+cache.Get(&k2)=(*string)(nil)
+cache.Get(&k3)="30"
+```
+
 ### PERFORMANCE 
 
 * number of keys is 500000,and size of value is 1KB,
