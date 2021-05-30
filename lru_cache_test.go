@@ -1,36 +1,36 @@
 package lru_cache
 
 import (
-	"fmt"
+	"go_utils/string_util"
+	"go_utils/test_util"
 	"testing"
 )
 
-
-
-//* string can not be key,because *key will changed. use string for key.
-func TestLRUCache_Set_Key_str_p_err(t *testing.T) {
-	cache := NewLRUCache(2)
-	k1 := "1"
-	v1 := "10"
-	k2 := "2"
-	v2 := "20"
-	cache.Set(&k1,&v1)
-	cache.Set(&k2,&v2)
-	key := "1"
-	fmt.Printf("&key=%#v\n", &key)
-	fmt.Printf("&k1=%#v\n", &k1)
-	value := cache.Get(&k1)
-	no_same_pointer_value := cache.Get(&key)
-	fmt.Printf("value=%#v\n", *value)
-	fmt.Printf("no_same_pointer_value=%#v\n", *no_same_pointer_value)
-}
-
-func Test_Map_ok(t *testing.T) {
-	m2 := make(map[int]int)
-	m2[1] = 10
-	value,ok := m2[1]
-	if !ok {
-		fmt.Printf("%s\n", "!ok")
+func Test_LRU_cache(t *testing.T) {
+	var maxSize = 50_0000
+	//create data
+	keys := make([]string, maxSize)
+	values := make([]string, maxSize)
+	cache := NewLRUCache(uint32(maxSize))
+	for i := 0; i < maxSize; i++ {
+		key := string_util.GetLengthString(64)
+		//1kb
+		value := string_util.GetLengthString(1024)
+		keys[i] = key
+		values[i] = value
 	}
-	fmt.Printf("value=%#v\n", value)
+	//-------
+	tu := test_util.NewTestUtil(uint32(maxSize))
+	tu.StartWithComment("my")
+	for i := 0; i < maxSize; i++ {
+		cache.Set(&keys[i], &values[i])
+	}
+	tu.End()
+	//-------
+	tu2 := test_util.NewTestUtil(uint32(maxSize))
+	tu2.StartWithComment("get ")
+	for i := 0; i < maxSize; i++ {
+		cache.Get(&keys[i])
+	}
+	tu2.End()
 }

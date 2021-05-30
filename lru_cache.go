@@ -1,7 +1,7 @@
 package lru_cache
 
 type LRUCache struct {
-	Map     map[string]*Value
+	Map     map[string]*DLinkedNode
 	Head    *DLinkedNode
 	Tail    *DLinkedNode
 	MaxSize uint32
@@ -10,21 +10,19 @@ type LRUCache struct {
 type Key struct {
 	DataP *string
 }
-type Value struct {
-	DataP       *string
-	LinkedNodeP *DLinkedNode
-}
+
 
 // DLinkedNode double linked node for lru cache.
 type DLinkedNode struct {
-	Data  *string
-	left  *DLinkedNode
-	right *DLinkedNode
+	NodeKey *string
+	NodeValue *string
+	left    *DLinkedNode
+	right   *DLinkedNode
 }
 
 func NewLRUCache(maxSize uint32) *LRUCache {
 	return &LRUCache{
-		Map:     make(map[string]*Value, 0),
+		Map:     make(map[string]*DLinkedNode, 0),
 		Size:    0,
 		MaxSize: maxSize,
 		Tail:    nil,
@@ -42,11 +40,11 @@ func NewLRUCache(maxSize uint32) *LRUCache {
 func (lru *LRUCache) Set(key, value *string) {
 	_, contains := lru.Map[*key]
 	if contains {
-		mapValue := lru.Map[*key]
-		mapValue.LinkedNodeP.Data = value
+		node := lru.Map[*key]
+		node.NodeValue = value
 	} else { //not contains
 		//(1) add node to head
-		node := &DLinkedNode{Data: key}
+		node := &DLinkedNode{NodeKey: key}
 		//double linked list.
 		node.right = lru.Head
 		//size is 0,1,lru.Head.left is null
@@ -55,8 +53,8 @@ func (lru *LRUCache) Set(key, value *string) {
 		}
 		lru.Head = node
 		//(2)set map
-		v := &Value{DataP: value, LinkedNodeP: node}
-		lru.Map[*key] = v
+		newNode := &DLinkedNode{NodeValue: value,NodeKey: key}
+		lru.Map[*key] = newNode
 		//(3)size ++
 		lru.Size++
 		//(4)if Size greater that MaxSize, remove Tail node and Size --.
@@ -72,21 +70,20 @@ func (lru *LRUCache) Get(key *string) *string {
 	if !contains {
 		return nil
 	} else { //contains.
-		node := value.LinkedNodeP
 		//nodeLeft maybe is nil.
-		nodeLeft := node.left
+		nodeLeft := value.left
 		// if is Head not node.
 		if nodeLeft != nil {
-			nodeRight := node.right
-			node.right = lru.Head
+			nodeRight := value.right
+			value.right = lru.Head
 			nodeLeft.right = nodeRight
-			lru.Head = node
+			lru.Head = value
 		} else {
 			//is Head node,init Tail
-			lru.Tail = node
+			lru.Tail = value
 		}
 	}
-	return value.DataP
+	return value.NodeValue
 
 }
 
