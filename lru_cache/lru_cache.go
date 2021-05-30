@@ -11,13 +11,12 @@ type Key struct {
 	DataP *string
 }
 
-
 // DLinkedNode double linked node for lru cache.
 type DLinkedNode struct {
-	NodeKey *string
+	NodeKey   *string
 	NodeValue *string
-	left    *DLinkedNode
-	right   *DLinkedNode
+	left      *DLinkedNode
+	right     *DLinkedNode
 }
 
 func NewLRUCache(maxSize uint32) *LRUCache {
@@ -50,10 +49,12 @@ func (lru *LRUCache) Set(key, value *string) {
 		//size is 0,1,lru.Head.left is null
 		if lru.Size >= 2 {
 			lru.Head.left = node
+		}else {
+			lru.Tail = node
 		}
 		lru.Head = node
 		//(2)set map
-		newNode := &DLinkedNode{NodeValue: value,NodeKey: key}
+		newNode := &DLinkedNode{NodeValue: value, NodeKey: key}
 		lru.Map[*key] = newNode
 		//(3)size ++
 		lru.Size++
@@ -87,9 +88,13 @@ func (lru *LRUCache) Get(key *string) *string {
 
 }
 
-//checkSizeRemoveNode if Size greater that MaxSize, remove Tail node and Size --.
+//checkSizeRemoveNode if Size greater that MaxSize,
+//remove Tail node
+//Size --.
+//rm map kv
 func (lru *LRUCache) checkSizeRemoveNode() {
 	if lru.Size > lru.MaxSize {
+		delete(lru.Map, *lru.Tail.NodeKey)
 		//1. remove Tail node
 		// if have one node. tailLeft is null.
 		tailLeft := lru.Tail.left
