@@ -1,7 +1,9 @@
 package lru_cache
 
+import "fmt"
+
 type LRUCache struct {
-	Map     map[string]*DLinkedNode
+	Map     map[interface{}]*DLinkedNode
 	Head    *DLinkedNode
 	Tail    *DLinkedNode
 	MaxSize uint32
@@ -13,15 +15,17 @@ type Key struct {
 
 // DLinkedNode double linked node for lru cache.
 type DLinkedNode struct {
-	NodeKey   *string
-	NodeValue *string
+	NodeKey   interface{}
+	NodeValue *interface{}
 	left      *DLinkedNode
 	right     *DLinkedNode
 }
-
+//NewLRUCache
+//maxSize should greater than 1
 func NewLRUCache(maxSize uint32) *LRUCache {
+
 	return &LRUCache{
-		Map:     make(map[string]*DLinkedNode, 0),
+		Map:     make(map[interface{}]*DLinkedNode, 0),
 		Size:    0,
 		MaxSize: maxSize,
 		Tail:    nil,
@@ -36,26 +40,23 @@ func NewLRUCache(maxSize uint32) *LRUCache {
 //2.check to size and rm node.
 // 2.1 if size less or equal: skip
 // 2.2 other: remove Tail node and Size --.
-func (lru *LRUCache) Set(key, value *string) {
-	_, contains := lru.Map[*key]
+func (lru *LRUCache) Set(key, value interface{}) {
+	v, contains := lru.Map[key]
 	if contains {
-		node := lru.Map[*key]
-		node.NodeValue = value
+		v.NodeValue = &value
 	} else { //not contains
 		//(1) add node to head
-		node := &DLinkedNode{NodeKey: key}
-		//double linked list.
+		node := &DLinkedNode{ NodeKey: key,NodeValue: &value}
 		node.right = lru.Head
-		//size is 0,1,lru.Head.left is null
-		if lru.Size >= 2 {
+		lru.Head = node
+		if lru.Size >= 1 {
 			lru.Head.left = node
 		}else {
+			//one element.
 			lru.Tail = node
 		}
-		lru.Head = node
 		//(2)set map
-		newNode := &DLinkedNode{NodeValue: value, NodeKey: key}
-		lru.Map[*key] = newNode
+		lru.Map[key] = node
 		//(3)size ++
 		lru.Size++
 		//(4)if Size greater that MaxSize, remove Tail node and Size --.
@@ -66,10 +67,10 @@ func (lru *LRUCache) Set(key, value *string) {
 //Get return *string value if kv exist.
 //if contains kv.
 //1. let value to be Head
-func (lru *LRUCache) Get(key *string) *string {
-	value, contains := lru.Map[*key]
+func (lru *LRUCache) Get(key interface{}) (interface{},error) {
+	value, contains := lru.Map[key]
 	if !contains {
-		return nil
+		return nil, fmt.Errorf("error:%s", "not contains key")
 	} else { //contains.
 		//nodeLeft maybe is nil.
 		nodeLeft := value.left
@@ -84,22 +85,20 @@ func (lru *LRUCache) Get(key *string) *string {
 			lru.Tail = value
 		}
 	}
-	return value.NodeValue
+	return *value.NodeValue,nil
 
 }
 
 //checkSizeRemoveNode if Size greater that MaxSize,
+//rm map kv
 //remove Tail node
 //Size --.
-//rm map kv
 func (lru *LRUCache) checkSizeRemoveNode() {
 	if lru.Size > lru.MaxSize {
-		delete(lru.Map, *lru.Tail.NodeKey)
-		//1. remove Tail node
-		// if have one node. tailLeft is null.
+		////rm map kv
+		delete(lru.Map, lru.Tail.NodeKey)
+		//remove Tail node
 		tailLeft := lru.Tail.left
-		lru.Tail = nil
-		tailLeft.right = nil
 		lru.Tail = tailLeft
 		//2. Size --
 		lru.Size--

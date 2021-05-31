@@ -1,6 +1,8 @@
 ## LRU_CACHE
 
-this is `kv <string,string>` lru cache.
+this is  lru cache.
+
+
 
 ### WHAT IS LRU_CACHE?
 
@@ -18,30 +20,7 @@ go get -u  github.com/dengjiawen8955/lru_cache
 2. example for use
 
 ```go
-package main
-import (
-	"fmt"
-	"github.com/dengjiawen8955/lru_cache/lru_cache"
-	"testing"
-)
 
-func Test_lru_cache(t *testing.T) {
-	k1 := "1"
-	v1 := "10"
-	k2 := "2"
-	v2 := "20"
-	k3 := "3"
-	v3 := "30"
-	cache := NewLRUCache(2)
-	cache.Set(&k1, &v1)
-	cache.Set(&k2, &v2)
-	fmt.Printf("cache.Size=%d\n", cache.Size)
-	cache.Set(&k3, &v3)
-	fmt.Printf("cache.Size=%d\n", cache.Size)
-	fmt.Printf("cache.Get(&k1)=%#v\n", *cache.Get(&k1))
-	fmt.Printf("cache.Get(&k2)=%#v\n", cache.Get(&k2))
-	fmt.Printf("cache.Get(&k3)=%#v\n", *cache.Get(&k3))
-}
 ```
 out put
 ```go
