@@ -20,15 +20,30 @@ go get -u  github.com/dengjiawen8955/lru_cache
 2. example for use
 
 ```go
+package main
 
+import (
+  "fmt"
+  "github.com/dengjiawen8955/lru_cache/lru_cache"
+)
+func main() {
+  k1 := "1"
+  v1 := "10"
+  k2 := "2"
+  v2 := "20"
+  cache := lru_cache.NewLRUCache(1)
+  cache.Set(k1, v1)
+  cache.Set(k2, v2)
+  value1, _ := cache.Get(k1)
+  fmt.Printf("value1=%#v\n", value1)
+  value2, _ := cache.Get(k2)
+  fmt.Printf("value2=%#v\n", value2)
+}
 ```
 out put
 ```go
-cache.Size=2
-cache.Size=2
-cache.Get(&k1)="10"
-cache.Get(&k2)=(*string)(nil)
-cache.Get(&k3)="30"
+value1=<nil>
+value2="20"
 ```
 
 ### PERFORMANCE 
